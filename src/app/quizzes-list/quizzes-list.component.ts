@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
+import { Quizz } from 'src/data/quizz';
+import { DataService } from '../data.service';
 
 @Component({
   selector: 'quizzes-list',
@@ -7,9 +9,12 @@ import { Component, OnInit } from '@angular/core';
 })
 export class QuizzesListComponent implements OnInit {
 
-  constructor() { }
+  @Input() quizzes:Quizz[];
+
+  constructor(private dataService:DataService) { }
 
   ngOnInit(): void {
+    this.quizzes = this.dataService.quizzes;
   }
 
 }
