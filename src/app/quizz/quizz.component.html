@@ -1,1 +1,2 @@
-<p>quizz works!</p>
+<span class="h2">{{ quizz.questions[step].content }}</span>
+<button *ngFor="let answer of quizz.questions[step].possibleAnswers; let i = index" type="button" class="btn btn-outline-primary" (click)="answerWith(i)">{{ answer.content }}</button>

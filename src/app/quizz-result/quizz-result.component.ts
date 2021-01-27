@@ -1,4 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Quizz } from 'src/data/quizz';
+import { DataService } from '../data.service';
 
 @Component({
   selector: 'quizz-result',
@@ -7,9 +10,13 @@ import { Component, OnInit } from '@angular/core';
 })
 export class QuizzResultComponent implements OnInit {
 
-  constructor() { }
+  finishedQuizz:Quizz;
+
+  constructor(private dataService:DataService, private router:Router, private route:ActivatedRoute) { }
 
   ngOnInit(): void {
+    this.finishedQuizz = this.dataService.getQuizzResult(this.route.snapshot.paramMap.get('id'));
+    
   }
 
 }

@@ -10,6 +10,7 @@ import { QuizzesResultsListComponent } from './quizzes-results-list/quizzes-resu
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { QuizzOverviewComponent } from './quizzes-list/quizz-overview/quizz-overview.component';
 import { AppRoutingModule } from './app-routing.module';
+import { QuizzAnswerResultComponent } from './quizz-result/quizz-answer-result/quizz-answer-result.component';
 
 @NgModule({
   declarations: [
@@ -18,7 +19,8 @@ import { AppRoutingModule } from './app-routing.module';
     QuizzComponent,
     QuizzResultComponent,
     QuizzesResultsListComponent,
-    QuizzOverviewComponent
+    QuizzOverviewComponent,
+    QuizzAnswerResultComponent
   ],
   imports: [
     BrowserModule,
