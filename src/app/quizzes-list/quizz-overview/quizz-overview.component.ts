@@ -20,4 +20,8 @@ export class QuizzOverviewComponent implements OnInit {
   launchQuizz():void{
     this.router.navigateByUrl('/quizz/'+this.quizz.id);
   }
+
+  showResult():void{
+    this.router.navigateByUrl('/result/'+this.quizz.id);
+  }
 }

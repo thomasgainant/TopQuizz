@@ -1,4 +1,4 @@
-<ngb-alert [type]="'info'" [dismissible]="false">
+<ngb-alert [type]="quizz.completion == null ? 'info' : (quizz.completion === 0 ? 'success' : 'danger')" [dismissible]="false">
     <h2>{{ quizz.title }}</h2>
     <button *ngIf="quizz.completion == null" type="button" class="btn btn-outline-primary" (click)="launchQuizz()">Start quizz</button>
     <button *ngIf="quizz.completion != null" type="button" class="btn btn-outline-primary" (click)="showResult()">Show results</button>
