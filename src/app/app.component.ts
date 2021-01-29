@@ -19,4 +19,9 @@ export class AppComponent {
     this.dataService.initQuizzes();
     window.location.reload();
   }
+
+  public logout():void{
+    this.authService.logout();
+    window.location.reload();
+  }
 }
