@@ -1,2 +1,4 @@
-<span class="h3">{{ answeredQuestion.content }}</span>
-<p>{{ answeredQuestion.chosenAnswer.content }}</p>
+<ngb-alert class="m-3" [type]="answeredQuestion.chosenAnswer.validity === 0 ? 'success' : 'danger'" [dismissible]="false">
+    <span class="h3">{{ answeredQuestion.content }}</span>
+    <p>{{ answeredQuestion.chosenAnswer.content }}</p>
+</ngb-alert>

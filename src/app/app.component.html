@@ -1,3 +1,29 @@
-<h1>TopQuizz</h1>
+<div class="container-sm">
+    <div class="row">
+        <div class="col">
+            <a routerLink="/"><h1>TopQuizz</h1></a>
+        </div>        
+    </div>
 
-<router-outlet></router-outlet>
+    <div class="row">
+        <div class="col">
+            <h2>TO DO</h2>
+            <ul>
+                <li>Results persistence through local storage</li>
+                <li>Local storage reset</li>
+                <li>Auth JWT</li>
+                <li>e2e</li>
+                <li>Open API contract</li>
+                <li>node.js backend + Sequelize + Postgre</li>
+                <li>Removable mock to full backend communication</li>
+                <li>Docker containers</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col">
+            <router-outlet></router-outlet>
+        </div>
+    </div>
+</div>

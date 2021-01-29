@@ -1,2 +1,14 @@
-<span class="h2">{{ quizz.questions[step].content }}</span>
-<button *ngFor="let answer of quizz.questions[step].possibleAnswers; let i = index" type="button" class="btn btn-outline-primary" (click)="answerWith(i)">{{ answer.content }}</button>
+<div class="card mb-3">
+    <img *ngIf="quizz.questions[step].image != null && quizz.questions[step].image != ''" src="{{ quizz.questions[step].image }}" class="card-img-top" alt="...">
+    <div class="card-body">
+      <span class="h2 card-title">{{ quizz.questions[step].content }}</span>
+      <!--<p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>-->
+      <div class="container-sm mt-3">
+          <div class="row">
+              <div class="col text-center">
+                <button *ngFor="let answer of quizz.questions[step].possibleAnswers; let i = index" type="button" class="btn btn-lg btn-outline-primary m-1" (click)="answerWith(i)">{{ answer.content }}</button>
+              </div>
+          </div>
+      </div>
+    </div>
+  </div>

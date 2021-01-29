@@ -16,7 +16,7 @@ export class QuizzResultComponent implements OnInit {
 
   ngOnInit(): void {
     this.finishedQuizz = this.dataService.getQuizzResult(this.route.snapshot.paramMap.get('id'));
-    
+    console.log(this.finishedQuizz);
   }
 
 }

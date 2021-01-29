@@ -1,1 +1,7 @@
+<span class="h2 m-1">
+    {{ finishedQuizz.title }}
+    <span *ngIf="finishedQuizz.completion === 0" class="badge bg-success">Passed</span>
+    <span *ngIf="finishedQuizz.completion === 1" class="badge bg-danger">Failed</span>
+</span>
+
 <quizz-answer-result *ngFor="let question of finishedQuizz.questions" [answeredQuestion]="question"></quizz-answer-result>

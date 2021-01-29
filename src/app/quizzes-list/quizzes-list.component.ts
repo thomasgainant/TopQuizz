@@ -15,6 +15,7 @@ export class QuizzesListComponent implements OnInit {
 
   ngOnInit(): void {
     this.quizzes = this.dataService.quizzes;
+    console.log(this.quizzes);
   }
 
 }
