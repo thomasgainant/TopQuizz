@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { AuthService } from './auth.service';
 import { DataService } from './data.service';
 
 @Component({
@@ -8,8 +9,10 @@ import { DataService } from './data.service';
 })
 export class AppComponent {
 
-  constructor(private dataService:DataService){
+  public authService:AuthService;
 
+  constructor(private authServiceInj:AuthService, private dataService:DataService){
+    this.authService = authServiceInj;
   }
 
   public reset():void{

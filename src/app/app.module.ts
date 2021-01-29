@@ -1,6 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { HttpClientModule } from '@angular/common/http';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { AppComponent } from './app.component';
 import { QuizzesListComponent } from './quizzes-list/quizzes-list.component';
@@ -11,6 +12,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { QuizzOverviewComponent } from './quizzes-list/quizz-overview/quizz-overview.component';
 import { AppRoutingModule } from './app-routing.module';
 import { QuizzAnswerResultComponent } from './quizz-result/quizz-answer-result/quizz-answer-result.component';
+import { LoginComponent } from './login/login.component';
 
 @NgModule({
   declarations: [
@@ -20,12 +22,16 @@ import { QuizzAnswerResultComponent } from './quizz-result/quizz-answer-result/q
     QuizzResultComponent,
     QuizzesResultsListComponent,
     QuizzOverviewComponent,
-    QuizzAnswerResultComponent
+    QuizzAnswerResultComponent,
+    LoginComponent
   ],
   imports: [
     BrowserModule,
     NgbModule,
-    AppRoutingModule
+    AppRoutingModule,
+    HttpClientModule,
+    FormsModule,
+    ReactiveFormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]
