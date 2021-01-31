@@ -6,7 +6,7 @@
       <div class="container-sm mt-3">
           <div class="row">
               <div class="col text-center">
-                <button *ngFor="let answer of quizz.questions[step].possibleAnswers; let i = index" type="button" class="btn btn-lg btn-outline-primary m-1" (click)="answerWith(i)">{{ answer.content }}</button>
+                <button *ngFor="let answer of quizz.questions[step].possibleAnswers; let i = index" type="button" class="btn btn-lg btn-outline-primary m-1 quizz-answer" (click)="answerWith(i)">{{ answer.content }}</button>
               </div>
           </div>
       </div>
