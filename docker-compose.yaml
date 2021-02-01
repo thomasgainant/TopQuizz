@@ -1,0 +1,42 @@
+version: "3"
+
+services:
+  database:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: topquizz
+      POSTGRES_PASSWORD: topquizz
+      POSTGRES_DB: topquizz
+      PGDATA: /data/postgres
+    volumes:
+      - ./data/:/docker-entrypoint-initdb.d/
+      - database:/data/postgres
+    ports:
+      - 5432:5432
+  
+  database-admin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: topquizz
+      PGADMIN_DEFAULT_PASSWORD: topquizz
+    volumes:
+      - database-admin:/root/.pgadmin
+    ports:
+      - ${PGADMIN_PORT:-5050}:80
+
+  backend:
+      build: ./backend
+      ports:
+          - 3000:3000
+      depends_on:
+          - database
+# frontend:
+#   build: ./frontend
+#        ports:
+#            - 3000:3000
+#        depends_on:
+#            - backend
+
+volumes:
+  database:
+  database-admin:

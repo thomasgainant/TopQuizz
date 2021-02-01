@@ -1,0 +1,7 @@
+{
+    "port": 3000,
+    "database": "topquizz",
+    "databaseLogin": "topquizz",
+    "databasePassword": "topquizz",
+    "databaseHost": "192.168.99.100"
+}

@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -36,44 +36,29 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var database_1 = require("./database");
-var path = require('path');
-var http = require('http');
-var oas3Tools = require('oas3-tools');
-var serverPort = require('./config.json').port;
-// swaggerRouter configuration
-var options = {
-    routing: {
-        controllers: path.join(__dirname, './controllers')
-    },
-};
-var expressAppConfig = oas3Tools.expressAppConfig(path.join(__dirname, 'api/openapi.yaml'), options);
-var app = expressAppConfig.getApp();
-var database = null;
-function main() {
-    return __awaiter(this, void 0, void 0, function () {
-        var _this = this;
-        return __generator(this, function (_a) {
-            return [2 /*return*/, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-                    return __generator(this, function (_a) {
-                        switch (_a.label) {
-                            case 0:
-                                //Database synchronisation
-                                database = new database_1.Database();
-                                return [4 /*yield*/, database.sync()];
-                            case 1:
-                                _a.sent();
-                                // Initialize the Swagger middleware
-                                http.createServer(app).listen(serverPort, function () {
-                                    console.log('Your server is listening on port %d (http://localhost:%d)', serverPort, serverPort);
-                                    console.log('Swagger-ui is available on http://localhost:%d/docs', serverPort);
-                                });
-                                resolve();
-                                return [2 /*return*/];
-                        }
-                    });
-                }); })];
+exports.Database = void 0;
+var _a = require('sequelize'), Sequelize = _a.Sequelize, DataTypes = _a.DataTypes, Model = _a.Model;
+var Database = /** @class */ (function () {
+    function Database() {
+        this.sequelize = new Sequelize(require('./config.json').database, require('./config.json').databaseLogin, require('./config.json').databasePassword, {
+            host: require('./config.json').databaseHost,
+            dialect: "postgres"
         });
-    });
-}
-main();
+    }
+    Database.prototype.sync = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var res;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.sequelize.sync()];
+                    case 1:
+                        res = _a.sent();
+                        this.connection = res;
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    return Database;
+}());
+exports.Database = Database;
