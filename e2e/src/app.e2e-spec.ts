@@ -8,9 +8,24 @@ describe('TopQuizz app end-to-end testing', () => {
     page = new AppPage();
   });
 
-  it('should display all quizzes', async () => {
+  it('should log in', async () => {
     await page.navigateTo();
 
+    await browser.driver.sleep(2000);
+    await browser.waitForAngular();
+
+    await element(by.css("input.login")).sendKeys("admin@example.com");
+    await element(by.css("input[type='password']")).sendKeys("1234");
+    await element(by.css("button.submit")).click();
+
+    await browser.driver.sleep(2000);
+    await browser.waitForAngular();
+
+    let login = await element(by.css("input.login"));
+    expect(login.isPresent()).toBeFalsy();
+  });
+
+  it('should display all quizzes', async () => {
     var quizzList = element.all(by.css('.quizz-overview'));
     expect(await quizzList.count()).toEqual(4);
   });
