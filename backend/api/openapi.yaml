@@ -1,0 +1,215 @@
+openapi: 3.0.1
+info:
+  title: TopQuizz
+  description: Angular + node.js full stack quizz app
+  version: 1.1.0
+servers:
+- url: /
+paths:
+  /login:
+    post:
+      tags:
+      - User
+      description: Logs a User in by sending a username and password
+      operationId: logUserIn
+      requestBody:
+        description: User with correct log in information
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      responses:
+        "200":
+          description: Logged in User with all its available data
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/User'
+      x-swagger-router-controller: User
+  /quizzes:
+    get:
+      tags:
+      - Quizz
+      description: Get available quizzes for User
+      operationId: getQuizzes
+      responses:
+        "200":
+          description: Quizzes available for User
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+                x-content-type: '*/*'
+      x-swagger-router-controller: Quizz
+  /quizz/{quizzId}:
+    get:
+      tags:
+      - Quizz
+      description: Gets a quizz with updated data, including results
+      operationId: getQuizz
+      parameters:
+      - name: quizzId
+        in: path
+        description: UUID of the quizz
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: Quizz with updated data
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Quizz'
+      x-swagger-router-controller: Quizz
+    post:
+      tags:
+      - Quizz
+      description: Sends an answer to a quizz
+      operationId: sendAnswer
+      parameters:
+      - name: quizzId
+        in: path
+        description: UUID of the quizz
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      requestBody:
+        description: Answer to add to this quizz
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Answer'
+        required: true
+      responses:
+        "200":
+          description: Quizz with updated data
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Quizz'
+      x-swagger-router-controller: Quizz
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+        token:
+          type: string
+        tokenExpiration:
+          type: string
+      example:
+        password: password
+        tokenExpiration: tokenExpiration
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        email: ""
+        token: token
+    Quizz:
+      required:
+      - id
+      - questions
+      - title
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        questions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Question'
+        answers:
+          type: array
+          items:
+            $ref: '#/components/schemas/Answer'
+        completion:
+          type: string
+          enum:
+          - Correct
+          - Incorrect
+      example:
+        completion: Correct
+        questions:
+        - image: image
+          chosenAnswer: null
+          correctAnswer:
+            validity: Correct
+            content: content
+          possibleAnswers:
+          - null
+          - null
+          content: content
+        - image: image
+          chosenAnswer: null
+          correctAnswer:
+            validity: Correct
+            content: content
+          possibleAnswers:
+          - null
+          - null
+          content: content
+        answers:
+        - null
+        - null
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        title: title
+    Question:
+      required:
+      - content
+      - possibleAnswers
+      type: object
+      properties:
+        content:
+          type: string
+        image:
+          type: string
+        correctAnswer:
+          $ref: '#/components/schemas/Answer'
+        chosenAnswer:
+          $ref: '#/components/schemas/Answer'
+        possibleAnswers:
+          type: array
+          items:
+            $ref: '#/components/schemas/Answer'
+      example:
+        image: image
+        chosenAnswer: null
+        correctAnswer:
+          validity: Correct
+          content: content
+        possibleAnswers:
+        - null
+        - null
+        content: content
+    Answer:
+      required:
+      - content
+      type: object
+      properties:
+        content:
+          type: string
+        validity:
+          type: string
+          enum:
+          - Correct
+          - Incorrect
+      example:
+        validity: Correct
+        content: content
