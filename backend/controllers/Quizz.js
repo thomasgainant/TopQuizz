@@ -1,34 +1,47 @@
 'use strict';
 
 var utils = require('../utils/writer.js');
+var User = require('../service/UserService');
 var Quizz = require('../service/QuizzService');
 
 module.exports.getQuizz = function getQuizz (req, res, next, quizzId) {
-  Quizz.getQuizz(quizzId)
+  User.identifyUser(req.get("Authorization")).then(
+    Quizz.getQuizz(quizzId)
     .then(function (response) {
       utils.writeJson(res, response);
     })
     .catch(function (response) {
       utils.writeJson(res, response);
-    });
+    })
+  ).catch(
+
+  );
 };
 
 module.exports.getQuizzes = function getQuizzes (req, res, next) {
-  Quizz.getQuizzes()
-    .then(function (response) {
-      utils.writeJson(res, response);
-    })
-    .catch(function (response) {
-      utils.writeJson(res, response);
-    });
+  User.identifyUser(req.get("Authorization")).then(
+    Quizz.getQuizzes()
+      .then(function (response) {
+        utils.writeJson(res, response);
+      })
+      .catch(function (response) {
+        utils.writeJson(res, response);
+      })
+  ).catch(
+
+  );
 };
 
 module.exports.sendAnswer = function sendAnswer (req, res, next, body, quizzId) {
-  Quizz.sendAnswer(body, quizzId)
-    .then(function (response) {
-      utils.writeJson(res, response);
-    })
-    .catch(function (response) {
-      utils.writeJson(res, response);
-    });
+  User.identifyUser(req.get("Authorization")).then(
+    Quizz.sendAnswer(body, quizzId)
+      .then(function (response) {
+        utils.writeJson(res, response);
+      })
+      .catch(function (response) {
+        utils.writeJson(res, response);
+      })
+  ).catch(
+
+  );
 };

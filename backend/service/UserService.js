@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.logUserIn = void 0;
+exports.identifyUser = exports.logUserIn = void 0;
 const uuid_1 = require("uuid");
 const writer = require('../utils/writer.js');
 /**
@@ -38,7 +38,7 @@ function logUserIn(body) {
                     reject(writer.respondWithCode(500, `Error: ${error}`));
                 }
                 user.token = uuid_1.v4();
-                user.tokenExpiration = new Date().getTime() / 1000;
+                user.tokenExpiration = new Date().getTime();
                 try {
                     yield User.update(user, {
                         where: {
@@ -60,3 +60,32 @@ function logUserIn(body) {
     });
 }
 exports.logUserIn = logUserIn;
+function identifyUser(headerValue) {
+    return new Promise(function (resolve, reject) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const database = require('../index').database;
+            const User = database.connection["models"]["User"];
+            let token = headerValue.replace('Bearer ', '');
+            console.log("Authorizing user with token " + token);
+            let user;
+            try {
+                user = yield User.findOne({
+                    where: {
+                        token: token
+                    }
+                });
+            }
+            catch (error) {
+                console.error("Could not fetch User with this token");
+                reject(writer.respondWithCode(500, `Error: ${error}`));
+            }
+            if (user == null) {
+                resolve(true);
+            }
+            else {
+                resolve(false);
+            }
+        });
+    });
+}
+exports.identifyUser = identifyUser;

@@ -58,3 +58,32 @@ export function logUserIn(body:User) {
   });
 }
 
+export function identifyUser(headerValue:string){
+  return new Promise(async function(resolve, reject) {
+    const database:Database = require('../index').database;
+    const User = database.connection["models"]["User"];
+
+    let token:string = headerValue.replace('Bearer ', '');
+    console.log("Authorizing user with token "+token);
+
+    let user;
+    try{
+      user = await User.findOne({
+            where: {
+              token: token
+            }
+        });
+    }
+    catch(error:any){
+      console.error("Could not fetch User with this token");
+      reject(writer.respondWithCode(500, `Error: ${error}`));
+    }
+
+    if(user == null){
+      resolve(true);
+    }
+    else{
+      resolve(false);
+    }
+  });
+}

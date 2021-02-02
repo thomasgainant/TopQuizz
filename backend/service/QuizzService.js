@@ -1,77 +1,37 @@
 'use strict';
-
-
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * Gets a quizz with updated data, including results
  *
  * quizzId Integer UUID of the quizz
  * returns Quizz
  **/
-exports.getQuizz = function(quizzId) {
-  return new Promise(function(resolve, reject) {
-    var examples = {};
-    examples['application/json'] = {
-  "completion" : "Correct",
-  "questions" : [ {
-    "image" : "image",
-    "correctAnswer" : {
-      "validity" : "Correct",
-      "content" : "content"
-    },
-    "possibleAnswers" : [ null, null ],
-    "content" : "content"
-  }, {
-    "image" : "image",
-    "correctAnswer" : {
-      "validity" : "Correct",
-      "content" : "content"
-    },
-    "possibleAnswers" : [ null, null ],
-    "content" : "content"
-  } ],
-  "answers" : [ null, null ],
-  "id" : "046b6c7f-0b8a-43b9-b35d-6489e6daee91",
-  "title" : "title"
+exports.getQuizz = function (quizzId) {
+    return new Promise(function (resolve, reject) {
+        return __awaiter(this, void 0, void 0, function* () {
+        });
+    });
 };
-    if (Object.keys(examples).length > 0) {
-      resolve(examples[Object.keys(examples)[0]]);
-    } else {
-      resolve();
-    }
-  });
-}
-
-
 /**
  * Get available quizzes for User
  *
  * returns List
  **/
-exports.getQuizzes = function() {
-  return new Promise(function(resolve, reject) {
-    var examples = {};
-    examples['application/json'] = [ {
-  "password" : "password",
-  "tokenExpiration" : "tokenExpiration",
-  "id" : "046b6c7f-0b8a-43b9-b35d-6489e6daee91",
-  "email" : "",
-  "token" : "token"
-}, {
-  "password" : "password",
-  "tokenExpiration" : "tokenExpiration",
-  "id" : "046b6c7f-0b8a-43b9-b35d-6489e6daee91",
-  "email" : "",
-  "token" : "token"
-} ];
-    if (Object.keys(examples).length > 0) {
-      resolve(examples[Object.keys(examples)[0]]);
-    } else {
-      resolve();
-    }
-  });
-}
-
-
+exports.getQuizzes = function () {
+    return new Promise(function (resolve, reject) {
+        return __awaiter(this, void 0, void 0, function* () {
+        });
+    });
+};
 /**
  * Sends an answer to a quizz
  *
@@ -79,37 +39,9 @@ exports.getQuizzes = function() {
  * quizzId Integer UUID of the quizz
  * returns Quizz
  **/
-exports.sendAnswer = function(body,quizzId) {
-  return new Promise(function(resolve, reject) {
-    var examples = {};
-    examples['application/json'] = {
-  "completion" : "Correct",
-  "questions" : [ {
-    "image" : "image",
-    "correctAnswer" : {
-      "validity" : "Correct",
-      "content" : "content"
-    },
-    "possibleAnswers" : [ null, null ],
-    "content" : "content"
-  }, {
-    "image" : "image",
-    "correctAnswer" : {
-      "validity" : "Correct",
-      "content" : "content"
-    },
-    "possibleAnswers" : [ null, null ],
-    "content" : "content"
-  } ],
-  "answers" : [ null, null ],
-  "id" : "046b6c7f-0b8a-43b9-b35d-6489e6daee91",
-  "title" : "title"
+exports.sendAnswer = function (body, quizzId) {
+    return new Promise(function (resolve, reject) {
+        return __awaiter(this, void 0, void 0, function* () {
+        });
+    });
 };
-    if (Object.keys(examples).length > 0) {
-      resolve(examples[Object.keys(examples)[0]]);
-    } else {
-      resolve();
-    }
-  });
-}
-
