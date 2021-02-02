@@ -8,57 +8,422 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Database = void 0;
-var _a = require('sequelize'), Sequelize = _a.Sequelize, DataTypes = _a.DataTypes, Model = _a.Model;
-var Database = /** @class */ (function () {
-    function Database() {
+const uuid_1 = require("uuid");
+const { Sequelize, DataTypes, Model } = require('sequelize');
+class Database {
+    constructor() {
         this.sequelize = new Sequelize(require('./config.json').database, require('./config.json').databaseLogin, require('./config.json').databasePassword, {
             host: require('./config.json').databaseHost,
             dialect: "postgres"
         });
-    }
-    Database.prototype.sync = function () {
-        return __awaiter(this, void 0, void 0, function () {
-            var res;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.sequelize.sync()];
-                    case 1:
-                        res = _a.sent();
-                        this.connection = res;
-                        return [2 /*return*/];
-                }
-            });
+        class User extends Model {
+        }
+        ;
+        User.init({
+            id: {
+                primaryKey: true,
+                type: DataTypes.UUID
+            },
+            email: {
+                type: DataTypes.STRING
+            },
+            password: {
+                type: DataTypes.STRING
+            },
+            token: {
+                type: DataTypes.STRING
+            },
+            tokenExpiration: {
+                type: DataTypes.INTEGER
+            }
+        }, {
+            // Other model options go here
+            sequelize: this.sequelize,
+            modelName: 'User' // We need to choose the model name
         });
-    };
-    return Database;
-}());
+        class Quizz extends Model {
+        }
+        ;
+        Quizz.init({
+            id: {
+                primaryKey: true,
+                type: DataTypes.UUID
+            },
+            title: {
+                type: DataTypes.STRING
+            },
+            questions: {
+                type: DataTypes.STRING(2048),
+                get: function () {
+                    //@ts-ignore
+                    return JSON.parse(this.getDataValue('questions'));
+                },
+                set: function (val) {
+                    //@ts-ignore
+                    return this.setDataValue('questions', JSON.stringify(val));
+                }
+            },
+            answers: {
+                type: DataTypes.STRING(2048),
+                get: function () {
+                    //@ts-ignore
+                    return JSON.parse(this.getDataValue('answers'));
+                },
+                set: function (val) {
+                    //@ts-ignore
+                    return this.setDataValue('answers', JSON.stringify(val));
+                }
+            },
+            completion: {
+                type: DataTypes.INTEGER
+            }
+        }, {
+            // Other model options go here
+            sequelize: this.sequelize,
+            modelName: 'Quizz' // We need to choose the model name
+        });
+    }
+    sync() {
+        return __awaiter(this, void 0, void 0, function* () {
+            let res = yield this.sequelize.sync();
+            this.connection = res;
+        });
+    }
+    init() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const database = require('./index').database;
+            const User = database.connection["models"]["User"];
+            let user;
+            try {
+                user = yield User.findOne({
+                    where: {
+                        email: "topquizz@topquizz.eu"
+                    }
+                });
+            }
+            catch (error) {
+                console.log("Could not fetch default User");
+            }
+            if (user == null) {
+                console.log("Could not find default User, injecting default data in database.");
+                try {
+                    user = yield User.create({
+                        id: uuid_1.v4(),
+                        email: "topquizz@topquizz.eu",
+                        password: "topquizz"
+                    });
+                }
+                catch (createDefaultUserError) {
+                    console.error("Could not create default user topquizz@topquizz.eu. Reason: " + createDefaultUserError);
+                }
+                let defaultQuizzes = [
+                    {
+                        id: uuid_1.v4(),
+                        title: "Zoology",
+                        questions: [
+                            {
+                                content: "How long does the gestation period of an african elephant last?",
+                                image: 'https://upload.wikimedia.org/wikipedia/commons/6/63/African_elephant_warning_raised_trunk.jpg',
+                                correctAnswer: {
+                                    content: "22 months"
+                                },
+                                possibleAnswers: [
+                                    {
+                                        content: "22 months"
+                                    },
+                                    {
+                                        content: "32 months"
+                                    }
+                                ]
+                            },
+                            {
+                                content: "Are cats carnivore or omnivore in nature?",
+                                image: 'https://upload.wikimedia.org/wikipedia/commons/4/4b/Domestic_Cat_Demonstrating_Dilated_Slit_Pupils.jpg',
+                                correctAnswer: {
+                                    content: "Carnivore"
+                                },
+                                possibleAnswers: [
+                                    {
+                                        content: "Carnivore"
+                                    },
+                                    {
+                                        content: "Omnivore"
+                                    }
+                                ]
+                            },
+                            {
+                                content: "How many animal species have been listed on planet Earth?",
+                                correctAnswer: {
+                                    content: "1 250 000"
+                                },
+                                possibleAnswers: [
+                                    {
+                                        content: "1 250 000"
+                                    },
+                                    {
+                                        content: "3 200 000"
+                                    }
+                                ]
+                            },
+                            {
+                                content: "What is the class of the common squid?",
+                                image: 'https://upload.wikimedia.org/wikipedia/commons/e/e1/Sepioteuthis_sepioidea_%28Caribbean_Reef_Squid%29.jpg',
+                                correctAnswer: {
+                                    content: "Cephalopoda"
+                                },
+                                possibleAnswers: [
+                                    {
+                                        content: "Cephalopoda"
+                                    },
+                                    {
+                                        content: "Arthropoda"
+                                    }
+                                ]
+                            },
+                            {
+                                content: "Can a five ounce african swallow carry a one pound coconut?",
+                                correctAnswer: {
+                                    content: "Yes"
+                                },
+                                possibleAnswers: [
+                                    {
+                                        content: "Yes"
+                                    },
+                                    {
+                                        content: "No"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        id: uuid_1.v4(),
+                        title: "Geography",
+                        questions: [
+                            {
+                                content: "How long does the gestation period of an elephant last?",
+                                correctAnswer: {
+                                    content: "22 months"
+                                },
+                                possibleAnswers: [
+                                    {
+                                        content: "22 months"
+                                    },
+                                    {
+                                        content: "32 months"
+                                    }
+                                ]
+                            },
+                            {
+                                content: "How long does the gestation period of an elephant last?",
+                                correctAnswer: {
+                                    content: "22 months"
+                                },
+                                possibleAnswers: [
+                                    {
+                                        content: "22 months"
+                                    },
+                                    {
+                                        content: "32 months"
+                                    }
+                                ]
+                            },
+                            {
+                                content: "How long does the gestation period of an elephant last?",
+                                correctAnswer: {
+                                    content: "22 months"
+                                },
+                                possibleAnswers: [
+                                    {
+                                        content: "22 months"
+                                    },
+                                    {
+                                        content: "32 months"
+                                    }
+                                ]
+                            },
+                            {
+                                content: "How long does the gestation period of an elephant last?",
+                                correctAnswer: {
+                                    content: "22 months"
+                                },
+                                possibleAnswers: [
+                                    {
+                                        content: "22 months"
+                                    },
+                                    {
+                                        content: "32 months"
+                                    }
+                                ]
+                            },
+                            {
+                                content: "How long does the gestation period of an elephant last?",
+                                correctAnswer: {
+                                    content: "22 months"
+                                },
+                                possibleAnswers: [
+                                    {
+                                        content: "22 months"
+                                    },
+                                    {
+                                        content: "32 months"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        id: uuid_1.v4(),
+                        title: "History",
+                        questions: [
+                            {
+                                content: "How long does the gestation period of an elephant last?",
+                                correctAnswer: {
+                                    content: "22 months"
+                                },
+                                possibleAnswers: [
+                                    {
+                                        content: "22 months"
+                                    },
+                                    {
+                                        content: "32 months"
+                                    }
+                                ]
+                            },
+                            {
+                                content: "How long does the gestation period of an elephant last?",
+                                correctAnswer: {
+                                    content: "22 months"
+                                },
+                                possibleAnswers: [
+                                    {
+                                        content: "22 months"
+                                    },
+                                    {
+                                        content: "32 months"
+                                    }
+                                ]
+                            },
+                            {
+                                content: "How long does the gestation period of an elephant last?",
+                                correctAnswer: {
+                                    content: "22 months"
+                                },
+                                possibleAnswers: [
+                                    {
+                                        content: "22 months"
+                                    },
+                                    {
+                                        content: "32 months"
+                                    }
+                                ]
+                            },
+                            {
+                                content: "How long does the gestation period of an elephant last?",
+                                correctAnswer: {
+                                    content: "22 months"
+                                },
+                                possibleAnswers: [
+                                    {
+                                        content: "22 months"
+                                    },
+                                    {
+                                        content: "32 months"
+                                    }
+                                ]
+                            },
+                            {
+                                content: "How long does the gestation period of an elephant last?",
+                                correctAnswer: {
+                                    content: "22 months"
+                                },
+                                possibleAnswers: [
+                                    {
+                                        content: "22 months"
+                                    },
+                                    {
+                                        content: "32 months"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        id: uuid_1.v4(),
+                        title: "Gastronomy",
+                        questions: [
+                            {
+                                content: "How long does the gestation period of an elephant last?",
+                                correctAnswer: {
+                                    content: "22 months"
+                                },
+                                possibleAnswers: [
+                                    {
+                                        content: "22 months"
+                                    },
+                                    {
+                                        content: "32 months"
+                                    }
+                                ]
+                            },
+                            {
+                                content: "How long does the gestation period of an elephant last?",
+                                correctAnswer: {
+                                    content: "22 months"
+                                },
+                                possibleAnswers: [
+                                    {
+                                        content: "22 months"
+                                    },
+                                    {
+                                        content: "32 months"
+                                    }
+                                ]
+                            },
+                            {
+                                content: "How long does the gestation period of an elephant last?",
+                                correctAnswer: {
+                                    content: "22 months"
+                                },
+                                possibleAnswers: [
+                                    {
+                                        content: "22 months"
+                                    },
+                                    {
+                                        content: "32 months"
+                                    }
+                                ]
+                            },
+                            {
+                                content: "How long does the gestation period of an elephant last?",
+                                correctAnswer: {
+                                    content: "22 months"
+                                },
+                                possibleAnswers: [
+                                    {
+                                        content: "22 months"
+                                    },
+                                    {
+                                        content: "32 months"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ];
+                const Quizz = database.connection["models"]["Quizz"];
+                for (let quizz of defaultQuizzes) {
+                    try {
+                        yield Quizz.create(quizz);
+                    }
+                    catch (createDefaultQuizzError) {
+                        console.error("Could not create default quizz " + quizz.title + ". Reason: " + createDefaultQuizzError);
+                    }
+                }
+            }
+        });
+    }
+}
 exports.Database = Database;

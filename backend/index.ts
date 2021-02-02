@@ -23,8 +23,15 @@ var database:any = null;
 async function main(){
     return new Promise<void>(async (resolve, reject) => {
         //Database synchronisation
-        database = new Database();        
-        await database.sync();
+        database = new Database();
+        try{
+            await database.sync();
+            await database.init();
+        }
+        catch(error:any){
+            console.error("Database initialisation error: "+error);
+            reject();
+        }
 
         // Initialize the Swagger middleware
         http.createServer(app).listen(serverPort, function () {
@@ -36,3 +43,5 @@ async function main(){
     });
 }
 main();
+
+exports.database = database;
