@@ -74,6 +74,8 @@ exports.getQuizzes = function() {
  **/
 exports.sendAnswer = function(body:Answer, quizzId:string) {
   return new Promise(async function(resolve, reject) {
+      console.log("Receiving answer for quizz #"+quizzId);
+      console.log("%j", body);
     const database:Database = require('../index').database;
     const Quizz = database.connection["models"]["Quizz"];
 
@@ -96,6 +98,7 @@ exports.sendAnswer = function(body:Answer, quizzId:string) {
         }
 
         quizz.answers.push(body);
+        quizz = checkQuizz(quizz);
 
         try{
             await Quizz.update(quizz, {
@@ -114,5 +117,42 @@ exports.sendAnswer = function(body:Answer, quizzId:string) {
         reject(writer.respondWithCode(404, `Could not find quizz with id ${quizzId}`));
     }
   });
+}
+
+function checkQuizz(quizz:Quizz):Quizz{
+    if(quizz.answers != null && quizz.answers.length == quizz.questions.length){
+        let everyAnswerCorrect:boolean = true;
+
+        for(let index in quizz.questions){
+            let question = quizz.questions[index];
+            if(question.correctAnswer != null){
+                question.chosenAnswer = quizz.answers[index];
+
+                if(checkAnswer(question.chosenAnswer, question.correctAnswer)){
+                    question.chosenAnswer.validity = Answer.Validity.Correct;
+                }
+                else{
+                    question.chosenAnswer.validity = Answer.Validity.Incorrect;
+                    everyAnswerCorrect = false;
+                }
+            }
+        }
+
+        if(everyAnswerCorrect){
+            quizz.completion = Quizz.Completion.Correct;
+        }
+        else{
+            quizz.completion = Quizz.Completion.Incorrect;
+        }
+    }
+
+    return quizz;
+}
+
+function checkAnswer(chosenAnswer:Answer, correctAnswer:Answer):boolean{
+    if(chosenAnswer.content === correctAnswer.content){
+      return true;
+    }
+    return false;
 }
 

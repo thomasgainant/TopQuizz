@@ -80,7 +80,12 @@ function identifyUser(headerValue) {
                 reject(writer.respondWithCode(500, `Error: ${error}`));
             }
             if (user == null) {
-                resolve(true);
+                if (new Date().getTime() < user.tokenExpiration) {
+                    resolve(true);
+                }
+                else {
+                    resolve(false);
+                }
             }
             else {
                 resolve(false);

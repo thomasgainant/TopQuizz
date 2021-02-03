@@ -16,7 +16,7 @@ export class AppComponent {
   }
 
   public reset():void{
-    this.dataService.initQuizzes();
+    //this.dataService.initQuizzes();
     window.location.reload();
   }
 

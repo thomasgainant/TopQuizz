@@ -80,7 +80,12 @@ export function identifyUser(headerValue:string){
     }
 
     if(user == null){
-      resolve(true);
+      if(new Date().getTime() < user.tokenExpiration){
+        resolve(true);
+      }
+      else{
+        resolve(false);
+      }
     }
     else{
       resolve(false);

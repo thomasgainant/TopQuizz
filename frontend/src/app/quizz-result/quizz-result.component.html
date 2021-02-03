@@ -1,7 +1,9 @@
-<span class="h2 m-1">
+<span class="h2 m-1" *ngIf="finishedQuizz">
     {{ finishedQuizz.title }}
     <span *ngIf="finishedQuizz.completion === 0" class="badge bg-success quizz-result">Passed</span>
     <span *ngIf="finishedQuizz.completion === 1" class="badge bg-danger quizz-result">Failed</span>
 </span>
 
-<quizz-answer-result *ngFor="let question of finishedQuizz.questions" [answeredQuestion]="question"></quizz-answer-result>
+<div *ngIf="finishedQuizz">
+    <quizz-answer-result *ngFor="let question of finishedQuizz.questions" [answeredQuestion]="question"></quizz-answer-result>
+</div>

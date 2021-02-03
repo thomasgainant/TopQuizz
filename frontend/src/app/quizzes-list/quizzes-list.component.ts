@@ -14,8 +14,10 @@ export class QuizzesListComponent implements OnInit {
   constructor(private dataService:DataService) { }
 
   ngOnInit(): void {
-    this.quizzes = this.dataService.quizzes;
-    console.log(this.quizzes);
+    this.dataService.getQuizzes().subscribe((result:Quizz[]) => {
+      this.quizzes = result;
+      console.log(this.quizzes);
+    });
   }
 
 }

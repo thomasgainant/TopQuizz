@@ -9,6 +9,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const answer_1 = require("../api/data/answer");
+const quizz_1 = require("../api/data/quizz");
+const writer = require('../utils/writer.js');
 /**
  * Gets a quizz with updated data, including results
  *
@@ -18,6 +21,26 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getQuizz = function (quizzId) {
     return new Promise(function (resolve, reject) {
         return __awaiter(this, void 0, void 0, function* () {
+            const database = require('../index').database;
+            const Quizz = database.connection["models"]["Quizz"];
+            let quizz;
+            try {
+                quizz = yield Quizz.findOne({
+                    where: {
+                        id: quizzId
+                    }
+                });
+            }
+            catch (error) {
+                console.error("Could not fetch Quizz with this id");
+                reject(writer.respondWithCode(500, `Error: ${error}`));
+            }
+            if (quizz != null) {
+                resolve(quizz);
+            }
+            else {
+                reject(writer.respondWithCode(404, `Could not find quizz with id ${quizzId}`));
+            }
         });
     });
 };
@@ -29,6 +52,17 @@ exports.getQuizz = function (quizzId) {
 exports.getQuizzes = function () {
     return new Promise(function (resolve, reject) {
         return __awaiter(this, void 0, void 0, function* () {
+            const database = require('../index').database;
+            const Quizz = database.connection["models"]["Quizz"];
+            let quizzes = [];
+            try {
+                quizzes = yield Quizz.findAll();
+            }
+            catch (error) {
+                console.error("Could not fetch Quizz with this id");
+                reject(writer.respondWithCode(500, `Error: ${error}`));
+            }
+            resolve(quizzes);
         });
     });
 };
@@ -42,6 +76,74 @@ exports.getQuizzes = function () {
 exports.sendAnswer = function (body, quizzId) {
     return new Promise(function (resolve, reject) {
         return __awaiter(this, void 0, void 0, function* () {
+            console.log("Receiving answer for quizz #" + quizzId);
+            console.log("%j", body);
+            const database = require('../index').database;
+            const Quizz = database.connection["models"]["Quizz"];
+            let quizz;
+            try {
+                quizz = yield Quizz.findOne({
+                    where: {
+                        id: quizzId
+                    }
+                });
+            }
+            catch (error) {
+                console.error("Could not fetch Quizz with this id");
+                reject(writer.respondWithCode(500, `Error: ${error}`));
+            }
+            if (quizz != null) {
+                if (quizz.answers == null || quizz.answers.length == 0) {
+                    quizz.answers = [];
+                }
+                quizz.answers.push(body);
+                quizz = checkQuizz(quizz);
+                try {
+                    yield Quizz.update(quizz, {
+                        where: {
+                            id: quizz.id
+                        }
+                    });
+                    resolve(writer.respondWithCode(200, quizz));
+                }
+                catch (modifyError) {
+                    reject(writer.respondWithCode(500, `Error: ${modifyError}`));
+                }
+            }
+            else {
+                reject(writer.respondWithCode(404, `Could not find quizz with id ${quizzId}`));
+            }
         });
     });
 };
+function checkQuizz(quizz) {
+    if (quizz.answers != null && quizz.answers.length == quizz.questions.length) {
+        let everyAnswerCorrect = true;
+        for (let index in quizz.questions) {
+            let question = quizz.questions[index];
+            if (question.correctAnswer != null) {
+                question.chosenAnswer = quizz.answers[index];
+                if (checkAnswer(question.chosenAnswer, question.correctAnswer)) {
+                    question.chosenAnswer.validity = answer_1.Answer.Validity.Correct;
+                }
+                else {
+                    question.chosenAnswer.validity = answer_1.Answer.Validity.Incorrect;
+                    everyAnswerCorrect = false;
+                }
+            }
+        }
+        if (everyAnswerCorrect) {
+            quizz.completion = quizz_1.Quizz.Completion.Correct;
+        }
+        else {
+            quizz.completion = quizz_1.Quizz.Completion.Incorrect;
+        }
+    }
+    return quizz;
+}
+function checkAnswer(chosenAnswer, correctAnswer) {
+    if (chosenAnswer.content === correctAnswer.content) {
+        return true;
+    }
+    return false;
+}
