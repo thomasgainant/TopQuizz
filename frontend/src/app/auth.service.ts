@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { tap, shareReplay } from 'rxjs/internal/operators';
 import * as moment from 'moment';
 
@@ -7,37 +7,28 @@ import { User } from 'src/data/user';
 import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
 
+import { environment } from './../environments/environment';
+
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
+  headers = new HttpHeaders().set('Content-Type', 'application/json');
+
   constructor(private http: HttpClient, private router: Router) {
 
   }
 
-  /*login(email:string, password:string ) {
-      return this.http.post<User>('/api/login', {email, password})
-      .pipe(
-        tap(res => this.setSession(res)),
-        shareReplay()
-      );
-  }*/
-
   login(email:string, password:string ) {
-    console.log(`Mocked login: ${email}, ${password}`);
-    return new Observable<User>((observer) => {
-        setTimeout(() => {
-          let mockedUser:User = {
-            token: '123456789',
-            tokenExpiration: new Date().getTime()
-          };
-
-          observer.next(mockedUser);
-          this.setSession(mockedUser);
-
-          console.log("Redirecting to home page");
-          window.location.reload();
-      }, 2000);
+    console.log(`Login to API with: ${email}, ${password}`);
+    let userToLogIn:User = {
+      email: email,
+      password: password
+    };
+    (this.http.post(environment.apiUrl+'/login/', userToLogIn, { params: new HttpParams(), headers: this.headers }) as Observable<User>).subscribe((loggedInUser:User) =>{
+      this.setSession(loggedInUser);
+      console.log("Redirecting to home page");
+      this.router.navigateByUrl('/');
     });
   }
         

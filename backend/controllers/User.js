@@ -1,5 +1,7 @@
 'use strict';
 
+const writer = require('../utils/writer.js');
+
 var utils = require('../utils/writer.js');
 var User = require('../service/UserService');
 

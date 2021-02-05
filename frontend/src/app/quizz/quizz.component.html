@@ -1,6 +1,6 @@
 <div class="card mb-3">
-    <img *ngIf="quizz.questions[step].image != null && quizz.questions[step].image != ''" src="{{ quizz.questions[step].image }}" class="card-img-top" alt="...">
-    <div class="card-body">
+    <img *ngIf="quizz && quizz.questions[step].image != null && quizz.questions[step].image != ''" src="{{ quizz.questions[step].image }}" class="card-img-top" alt="...">
+    <div *ngIf="quizz" class="card-body">
       <span class="h2 card-title">{{ quizz.questions[step].content }}</span>
       <!--<p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>-->
       <div class="container-sm mt-3">

@@ -31,14 +31,22 @@ export function logUserIn(body:User) {
         }
         catch(error:any){
           console.error("Could not find User with this login data");
-          reject(writer.respondWithCode(500, `Error: ${error}`));
+          reject(writer.respondWithCode(403, `Error: ${error}`));
         }
 
+        console.log("User authenticated, generating new token...");
         user.token = uuidv4();
-        user.tokenExpiration = new Date().getTime();
+        user.tokenExpiration = new Date().getTime() + 1000*60*60;
+        console.log("Token is "+user.token+", valid until "+new Date(user.tokenExpiration));
 
         try{
-          await User.update(user, {
+          console.log("Saving user with new token:");
+          console.log("%j", user);
+
+          await User.update({
+            token: user.token,
+            tokenExpiration: user.tokenExpiration
+          }, {
               where: {
                 id: user.id
               }
@@ -47,7 +55,8 @@ export function logUserIn(body:User) {
           resolve(writer.respondWithCode(200, {token: user.token, tokenExpiration: user.tokenExpiration}));
         }
         catch(modifyError){
-            reject(writer.respondWithCode(500, `Error: ${modifyError}`));
+          console.error('Could not save token for user. Reason: '+modifyError);
+          reject(writer.respondWithCode(500, `Error: ${modifyError}`));
         }
     }
     else{
@@ -60,35 +69,41 @@ export function logUserIn(body:User) {
 
 export function identifyUser(headerValue:string){
   return new Promise(async function(resolve, reject) {
-    const database:Database = require('../index').database;
-    const User = database.connection["models"]["User"];
-
-    let token:string = headerValue.replace('Bearer ', '');
-    console.log("Authorizing user with token "+token);
-
-    let user;
-    try{
-      user = await User.findOne({
-            where: {
-              token: token
-            }
-        });
+    if(headerValue == null || headerValue == ""){
+      console.log("Could not authorize user as no authorization header has been sent.");
+      resolve(false);
     }
-    catch(error:any){
-      console.error("Could not fetch User with this token");
-      reject(writer.respondWithCode(500, `Error: ${error}`));
-    }
+    else{
+      const database:Database = require('../index').database;
+      const User = database.connection["models"]["User"];
 
-    if(user == null){
-      if(new Date().getTime() < user.tokenExpiration){
-        resolve(true);
+      let token:string = headerValue.replace('Bearer ', '');
+      console.log("Authorizing user with token "+token);
+
+      let user;
+      try{
+        user = await User.findOne({
+              where: {
+                token: token
+              }
+          });
+      }
+      catch(error:any){
+        console.error("Could not fetch User with this token");
+        reject(writer.respondWithCode(500, `Error: ${error}`));
+      }
+
+      if(user != null){
+        if(new Date().getTime() < user.tokenExpiration){
+          resolve(true);
+        }
+        else{
+          resolve(false);
+        }
       }
       else{
         resolve(false);
       }
-    }
-    else{
-      resolve(false);
     }
   });
 }

@@ -26,16 +26,16 @@ export class Database{
                 type: DataTypes.UUID
             },
             email: {
-                type: DataTypes.STRING
+                type: DataTypes.STRING(2048)
             },
             password: {
-                type: DataTypes.STRING
+                type: DataTypes.STRING(2048)
             },
             token: {
-                type: DataTypes.STRING
+                type: DataTypes.STRING(2048)
             },
             tokenExpiration: {
-                type: DataTypes.INTEGER
+                type: DataTypes.STRING(2048)
             }
           }, {
             // Other model options go here

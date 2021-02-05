@@ -35,12 +35,19 @@ function logUserIn(body) {
                 }
                 catch (error) {
                     console.error("Could not find User with this login data");
-                    reject(writer.respondWithCode(500, `Error: ${error}`));
+                    reject(writer.respondWithCode(403, `Error: ${error}`));
                 }
+                console.log("User authenticated, generating new token...");
                 user.token = uuid_1.v4();
-                user.tokenExpiration = new Date().getTime();
+                user.tokenExpiration = new Date().getTime() + 1000 * 60 * 60;
+                console.log("Token is " + user.token + ", valid until " + new Date(user.tokenExpiration));
                 try {
-                    yield User.update(user, {
+                    console.log("Saving user with new token:");
+                    console.log("%j", user);
+                    yield User.update({
+                        token: user.token,
+                        tokenExpiration: user.tokenExpiration
+                    }, {
                         where: {
                             id: user.id
                         }
@@ -48,6 +55,7 @@ function logUserIn(body) {
                     resolve(writer.respondWithCode(200, { token: user.token, tokenExpiration: user.tokenExpiration }));
                 }
                 catch (modifyError) {
+                    console.error('Could not save token for user. Reason: ' + modifyError);
                     reject(writer.respondWithCode(500, `Error: ${modifyError}`));
                 }
             }
@@ -63,32 +71,38 @@ exports.logUserIn = logUserIn;
 function identifyUser(headerValue) {
     return new Promise(function (resolve, reject) {
         return __awaiter(this, void 0, void 0, function* () {
-            const database = require('../index').database;
-            const User = database.connection["models"]["User"];
-            let token = headerValue.replace('Bearer ', '');
-            console.log("Authorizing user with token " + token);
-            let user;
-            try {
-                user = yield User.findOne({
-                    where: {
-                        token: token
+            if (headerValue == null || headerValue == "") {
+                console.log("Could not authorize user as no authorization header has been sent.");
+                resolve(false);
+            }
+            else {
+                const database = require('../index').database;
+                const User = database.connection["models"]["User"];
+                let token = headerValue.replace('Bearer ', '');
+                console.log("Authorizing user with token " + token);
+                let user;
+                try {
+                    user = yield User.findOne({
+                        where: {
+                            token: token
+                        }
+                    });
+                }
+                catch (error) {
+                    console.error("Could not fetch User with this token");
+                    reject(writer.respondWithCode(500, `Error: ${error}`));
+                }
+                if (user != null) {
+                    if (new Date().getTime() < user.tokenExpiration) {
+                        resolve(true);
                     }
-                });
-            }
-            catch (error) {
-                console.error("Could not fetch User with this token");
-                reject(writer.respondWithCode(500, `Error: ${error}`));
-            }
-            if (user == null) {
-                if (new Date().getTime() < user.tokenExpiration) {
-                    resolve(true);
+                    else {
+                        resolve(false);
+                    }
                 }
                 else {
                     resolve(false);
                 }
-            }
-            else {
-                resolve(false);
             }
         });
     });

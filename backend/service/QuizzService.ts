@@ -79,7 +79,7 @@ exports.sendAnswer = function(body:Answer, quizzId:string) {
     const database:Database = require('../index').database;
     const Quizz = database.connection["models"]["Quizz"];
 
-    let quizz;
+    let quizz:any;
     try{
         quizz = await Quizz.findOne({
             where: {
@@ -92,16 +92,24 @@ exports.sendAnswer = function(body:Answer, quizzId:string) {
         reject(writer.respondWithCode(500, `Error: ${error}`));
     }
 
+    console.log("%j", quizz);
+
     if(quizz != null){
-        if(quizz.answers == null || quizz.answers.length == 0){
+        if(quizz.answers == null || !Array.isArray(quizz.answers)){
             quizz.answers = [];
         }
 
+        console.log("%j", body);
         quizz.answers.push(body);
+        console.log("%j", quizz);
         quizz = checkQuizz(quizz);
 
         try{
-            await Quizz.update(quizz, {
+            await Quizz.update({
+                questions: quizz.questions,
+                answers: quizz.answers,
+                completion: quizz.completion
+            }, {
                 where: {
                   id: quizz.id
                 }
@@ -110,10 +118,12 @@ exports.sendAnswer = function(body:Answer, quizzId:string) {
             resolve(writer.respondWithCode(200, quizz));
         }
         catch(modifyError){
+            console.error(`Could not modify quizz with id ${quizzId}. Reason: ${modifyError}`);
             reject(writer.respondWithCode(500, `Error: ${modifyError}`));
         }
     }
     else{
+        console.error(`Could not find quizz with id ${quizzId}`);
         reject(writer.respondWithCode(404, `Could not find quizz with id ${quizzId}`));
     }
   });
