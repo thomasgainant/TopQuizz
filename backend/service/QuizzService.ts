@@ -95,27 +95,37 @@ exports.sendAnswer = function(body:Answer, quizzId:string) {
     console.log("%j", quizz);
 
     if(quizz != null){
-        if(quizz.answers == null || !Array.isArray(quizz.answers)){
-            quizz.answers = [];
+        //FIX creates a copy of the quizz because Sequelize seems to lock the object for modification
+        let clone = (JSON.parse(JSON.stringify(quizz)));;
+
+        console.log("QUIZZ ANSWERS");
+        console.log("%j", clone.answers);
+        console.log(typeof clone);
+        console.log(typeof clone.answers);
+        if(clone.answers == null || Array.isArray(clone.answers) === false){
+            console.log("init quizz answers");
+            clone.answers = [];
         }
 
+        console.log("%j", clone.answers);
         console.log("%j", body);
-        quizz.answers.push(body);
-        console.log("%j", quizz);
-        quizz = checkQuizz(quizz);
+        console.log(typeof body);
+        clone.answers.push(body);
+        console.log("%j", clone.answers);
+        clone = checkQuizz(clone);
 
         try{
             await Quizz.update({
-                questions: quizz.questions,
-                answers: quizz.answers,
-                completion: quizz.completion
+                questions: clone.questions,
+                answers: clone.answers,
+                completion: clone.completion
             }, {
                 where: {
-                  id: quizz.id
+                  id: clone.id
                 }
             });
 
-            resolve(writer.respondWithCode(200, quizz));
+            resolve(writer.respondWithCode(200, clone));
         }
         catch(modifyError){
             console.error(`Could not modify quizz with id ${quizzId}. Reason: ${modifyError}`);
