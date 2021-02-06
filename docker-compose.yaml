@@ -24,18 +24,18 @@ services:
     ports:
       - ${PGADMIN_PORT:-5050}:80
 
-#  backend:
-#      build: ./backend
-#      ports:
-#          - 5000:5000
-#      depends_on:
-#          - database
-# frontend:
-#   build: ./frontend
-#        ports:
-#            - 3000:3000
-#        depends_on:
-#            - backend
+  backend:
+      build: ./backend
+      ports:
+          - 5000:5000
+      depends_on:
+          - database
+ frontend:
+   build: ./frontend
+        ports:
+            - 3000:80
+        depends_on:
+            - backend
 
 volumes:
   database:

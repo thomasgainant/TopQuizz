@@ -25,6 +25,16 @@ docker volume ls
 docker volume rm <volume_id/name> <volume_id/name> <volume_id/name> ...
 ```
 
+## Using the app
+
+The app is available on http://localhost:3000
+
+An example account is available with the login **topquizz@topquizz.eu** and the password **topquizz**.
+
+A database administration app on locahost:5050 is also available using the same login information.
+
+The database connection uses the login **topquizz** and passwordd **topquizz**
+
 ## Running the different part of the app independently
 
 You can comment the different containers in the docker-compose.yaml file to avoid running them with docker-compose. The database containers should not be commented, though.
